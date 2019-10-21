@@ -25,7 +25,7 @@ const AccountDetails = props => {
   const [values, setValues] = useState({
     firstName: 'Shen',
     lastName: 'Zhi',
-    email: 'shen.zhi@devias.io',
+    email: 'email@email.com',
     phone: '',
     state: 'Alabama',
     country: 'USA'
