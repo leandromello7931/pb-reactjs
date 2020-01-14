@@ -22,12 +22,12 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Profile = props => {
-  const { className, ...rest } = props;
+  const { className, name, ...rest } = props;
 
   const classes = useStyles();
 
   const user = {
-    name: 'Leandro Mello',
+    name: name,
     avatar: '/images/avatars/avatar_0.png',
     bio: 'Admnistrador'
   };
