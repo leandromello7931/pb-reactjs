@@ -3,6 +3,9 @@ import { Link as RouterLink, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import validate from 'validate.js';
 import useStyles from './styles.js';
+import { css } from '@emotion/core';
+import ClipLoader from 'react-spinners/ClipLoader';
+
 import {
   Grid,
   Button,
@@ -12,6 +15,9 @@ import {
   Typography
 } from '@material-ui/core';
 // import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+
+import api from '../../services/api';
+
 
 const schema = {
   email: {
@@ -28,6 +34,11 @@ const schema = {
     }
   }
 };
+
+const override = css`
+
+  border-color: red;
+`;
 
 
 const SignIn = props => {
@@ -56,6 +67,7 @@ const SignIn = props => {
   //   history.goBack();
   // };
 
+
   const handleChange = event => {
     event.persist();
 
@@ -75,9 +87,18 @@ const SignIn = props => {
     }));
   };
 
-  const handleSignIn = event => {
+  const handleSignIn = async event => {
     event.preventDefault();
-    history.push('/dashboard');
+    const user = { 
+      login: formState.value.email, 
+      password: formState.value.password
+    };
+
+    const response = await api.post('/users/index', user);
+    
+    console.log(response);
+
+    //history.push('/dashboard');
   };
 
   const hasError = field =>
@@ -190,6 +211,11 @@ const SignIn = props => {
                   type="submit"
                   variant="contained"
                 >
+                  <ClipLoader 
+                    color={'#123abc'}
+                    css={override}
+                    size={30}
+                  />
                   Sign in now
                 </Button>
                 <Typography
