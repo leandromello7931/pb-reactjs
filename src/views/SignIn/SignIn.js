@@ -48,10 +48,12 @@ const SignIn = props => {
 
   const [formState, setFormState] = useState({
     isValid: false,
+    isLoading: false,
     values: {},
     touched: {},
     errors: {}
   });
+  const [isLoading, setIsLoding] = useState(false);
 
   useEffect(() => {
     const errors = validate(formState.values, schema);
@@ -66,7 +68,6 @@ const SignIn = props => {
   // const handleBack = () => {
   //   history.goBack();
   // };
-
 
   const handleChange = event => {
     event.persist();
@@ -88,16 +89,26 @@ const SignIn = props => {
   };
 
   const handleSignIn = async event => {
+    setIsLoding(true);
+
     event.preventDefault();
     const user = { 
-      login: formState.value.email, 
-      password: formState.value.password
+      login: formState.values.email, 
+      password: formState.values.password
     };
-
-    const response = await api.post('/users/index', user);
+    await api.post('/users/login', user, {
+      headers:{
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(response => {
+        localStorage.setItem('token', response.data.token);
+      })
+      .catch(err => console.log(err));
     
-    console.log(response);
 
+
+    setIsLoding(false);
     //history.push('/dashboard');
   };
 
@@ -211,12 +222,13 @@ const SignIn = props => {
                   type="submit"
                   variant="contained"
                 >
-                  <ClipLoader 
-                    color={'#123abc'}
-                    css={override}
-                    size={30}
-                  />
-                  Sign in now
+                  { isLoading ? (
+                    <ClipLoader 
+                      color={'#123abc'}
+                      css={override}
+                      size={30}
+                    /> ) : ('') }
+                  Sign In
                 </Button>
                 <Typography
                   color="textSecondary"
