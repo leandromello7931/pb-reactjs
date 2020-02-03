@@ -36,8 +36,7 @@ const schema = {
 };
 
 const override = css`
-
-  border-color: red;
+  border-color: #fff;
 `;
 
 
@@ -102,13 +101,17 @@ const SignIn = props => {
       }
     })
       .then(response => {
+        setIsLoding(false);
         localStorage.setItem('token', response.data.token);
+        history.push('/dashboard');
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        console.log(err);
+      });
     
 
 
-    setIsLoding(false);
+  
     //history.push('/dashboard');
   };
 
