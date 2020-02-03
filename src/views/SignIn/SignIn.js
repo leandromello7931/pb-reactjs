@@ -5,7 +5,7 @@ import validate from 'validate.js';
 import useStyles from './styles.js';
 import { css } from '@emotion/core';
 import ClipLoader from 'react-spinners/ClipLoader';
-
+import CustomizedSnackbar from '../../components/Snackbar/'
 import {
   Grid,
   Button,
@@ -48,13 +48,16 @@ const SignIn = props => {
   const [formState, setFormState] = useState({
     isValid: false,
     isLoading: false,
+    loginFailed: false,
+    openSnack: false,
     values: {},
     touched: {},
     errors: {}
   });
-  const [isLoading, setIsLoding] = useState(false);
+
 
   useEffect(() => {
+    
     const errors = validate(formState.values, schema);
 
     setFormState(formState => ({
@@ -62,8 +65,9 @@ const SignIn = props => {
       isValid: errors ? false : true,
       errors: errors || {}
     }));
-  }, [formState.values]);
 
+  }, [formState.values]);
+ 
   // const handleBack = () => {
   //   history.goBack();
   // };
@@ -88,35 +92,54 @@ const SignIn = props => {
   };
 
   const handleSignIn = async event => {
-    setIsLoding(true);
 
     event.preventDefault();
+
+    setFormState(formState => ({
+      ...formState,
+      isLoading: true,
+    }));
+    
+    console.log(formState.isLoading);
+
     const user = { 
       login: formState.values.email, 
       password: formState.values.password
     };
+
+
     await api.post('/users/login', user, {
       headers:{
         'Content-Type': 'application/json',
       }
     })
       .then(response => {
-        setIsLoding(false);
         localStorage.setItem('token', response.data.token);
         history.push('/dashboard');
       })
       .catch(err => {
-        console.log(err);
+        console.log(err.response);
+        if(err.response.status === 401){
+          console.log('ops');
+        }
       });
-    
-
-
-  
-    //history.push('/dashboard');
+    history.push('/dashboard');
   };
 
   const hasError = field =>
     formState.touched[field] && formState.errors[field] ? true : false;
+
+
+  //Snackbar functions
+
+  const handleSnackBarClose = () => {
+    setFormState(formState => ({
+      ...formState,
+      openSnack: true,
+    }));
+
+  }
+
 
   return (
     <div className={classes.root}>
@@ -225,13 +248,12 @@ const SignIn = props => {
                   type="submit"
                   variant="contained"
                 >
-                  { isLoading ? (
+                  { formState.isLoading ? (
                     <ClipLoader 
                       color={'#123abc'}
                       css={override}
                       size={30}
-                    /> ) : ('') }
-                  Sign In
+                    /> ) : (' Sign In') }
                 </Button>
                 <Typography
                   color="textSecondary"
@@ -251,7 +273,16 @@ const SignIn = props => {
           </div>
         </Grid>
       </Grid>
+      <CustomizedSnackbar
+        duration={3000}
+        handleClose={handleSnackBarClose}
+        message="Email ou senha inválidos"
+        open={formState.openSnack}
+        severity="error"
+        variant= "outlined"
+      />
     </div>
+    
   );
 };
 
