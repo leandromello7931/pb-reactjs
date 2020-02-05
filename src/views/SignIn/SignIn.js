@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import validate from 'validate.js';
 import useStyles from './styles.js';
 import { css } from '@emotion/core';
-import ClipLoader from 'react-spinners/ClipLoader';
+import BeatLoader from 'react-spinners/BeatLoader';
 import CustomizedSnackbar from '../../components/Snackbar/'
 import {
   Grid,
@@ -37,6 +37,8 @@ const schema = {
 
 const override = css`
   border-color: #fff;
+  display: flex;
+  padding: 3.5px 0;
 `;
 
 
@@ -54,10 +56,8 @@ const SignIn = props => {
     touched: {},
     errors: {}
   });
-
-
   useEffect(() => {
-    
+
     const errors = validate(formState.values, schema);
 
     setFormState(formState => ({
@@ -67,7 +67,7 @@ const SignIn = props => {
     }));
 
   }, [formState.values]);
- 
+
   // const handleBack = () => {
   //   history.goBack();
   // };
@@ -91,51 +91,50 @@ const SignIn = props => {
     }));
   };
 
-  const handleSignIn = async event => {
-
+  const handleSignIn = async (event) => {
     event.preventDefault();
-
+    const user = {
+      login: formState.values.email,
+      password: formState.values.password
+    };
     setFormState(formState => ({
       ...formState,
       isLoading: true,
     }));
-    
-    console.log(formState.isLoading);
-
-    const user = { 
-      login: formState.values.email, 
-      password: formState.values.password
-    };
-
-
-    await api.post('/users/login', user, {
+    const response = await api.post('/users/login', user, {
       headers:{
         'Content-Type': 'application/json',
       }
-    })
-      .then(response => {
-        localStorage.setItem('token', response.data.token);
-        history.push('/dashboard');
-      })
-      .catch(err => {
-        console.log(err.response);
-        if(err.response.status === 401){
-          console.log('ops');
-        }
-      });
-    history.push('/dashboard');
+    }).then( res => {
+      return res;
+    }).catch( err => {
+      return err.response;
+    });
+    setFormState(formState => ({
+      ...formState,
+      isLoading: false,
+    }));
+    if(response.status === 200){
+      localStorage.setItem('token', response.data.token);
+      history.push('/dashboard');
+    }else{
+      setFormState(formState => ({
+        ...formState,
+        loginFailed: true,
+        openSnack: true
+      }));
+    }
   };
+
 
   const hasError = field =>
     formState.touched[field] && formState.errors[field] ? true : false;
-
-
   //Snackbar functions
 
   const handleSnackBarClose = () => {
     setFormState(formState => ({
       ...formState,
-      openSnack: true,
+      openSnack: false,
     }));
 
   }
@@ -201,8 +200,8 @@ const SignIn = props => {
                 >
                   Sign in
                 </Typography>
-              
-                
+
+
                 <Typography
                   align="left"
                   className={classes.sugestion}
@@ -226,6 +225,7 @@ const SignIn = props => {
                   variant="outlined"
                 />
                 <TextField
+                  autoComplete="on"
                   className={classes.textField}
                   error={hasError('password')}
                   fullWidth
@@ -248,11 +248,12 @@ const SignIn = props => {
                   type="submit"
                   variant="contained"
                 >
+                 
                   { formState.isLoading ? (
-                    <ClipLoader 
-                      color={'#123abc'}
+                    <BeatLoader
+                      color={'#fff'}
                       css={override}
-                      size={30}
+                      size={15}
                     /> ) : (' Sign In') }
                 </Button>
                 <Typography
@@ -276,13 +277,15 @@ const SignIn = props => {
       <CustomizedSnackbar
         duration={3000}
         handleClose={handleSnackBarClose}
+        horizontal="right"
         message="Email ou senha inválidos"
         open={formState.openSnack}
         severity="error"
         variant= "outlined"
+        vertical="top"
       />
     </div>
-    
+
   );
 };
 
