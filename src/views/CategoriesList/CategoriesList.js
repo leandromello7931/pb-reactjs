@@ -1,7 +1,6 @@
 import React, {  useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
-
-import { CategoriesToolbar, CategoriesTable } from './components';
+import {  CategoryCard } from './components';
 import api from '../../services/api';
 
 const useStyles = makeStyles(theme => ({
@@ -37,9 +36,12 @@ const CategoriesList = () => {
 
   return (
     <div className={classes.root}>
-      <CategoriesToolbar />
+      {/* <CategoriesToolbar /> */}
       <div className={classes.content}>
-        {categories.length > 0  ? <CategoriesTable categories={categories} /> : <h2>Nenhuma Categoria encontrada.</h2> }
+        {/* {categories.length > 0  ? <CategoriesTable categories={categories} /> : <Typography variant="h1">Nenhuma Categoria encontrada.</Typography> } */}
+        {/* <CategoriesMTable /> */}
+        <CategoryCard />
+        <CategoryCard />
       </div>
     </div>
   );

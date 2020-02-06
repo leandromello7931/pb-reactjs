@@ -114,16 +114,17 @@ const SignIn = props => {
       ...formState,
       isLoading: false,
     }));
-    if(response.status === 200){
-      localStorage.setItem('token', response.data.token);
-      history.push('/dashboard');
-    }else{
-      setFormState(formState => ({
-        ...formState,
-        loginFailed: true,
-        openSnack: true
-      }));
-    }
+    if(response)
+      if(response.status === 200){
+        localStorage.setItem('token', response.data.token);
+        history.push('/dashboard');
+      }else{
+        setFormState(formState => ({
+          ...formState,
+          loginFailed: true,
+          openSnack: true
+        }));
+      }
   };
 
 
