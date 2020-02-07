@@ -1,7 +1,8 @@
-import React, {  useEffect } from 'react';
+import React, {  useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import {  CategoryCard } from './components';
 import api from '../../services/api';
+import { Grid } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -12,11 +13,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-var categories = [];
-
 const CategoriesList = () => {
   const classes = useStyles();
-
+  const [categories, setCategories] = useState([]);
   useEffect(() => {
     getCategories();
   }, []);
@@ -24,14 +23,25 @@ const CategoriesList = () => {
   const getCategories = async () => {
     const token = localStorage.getItem('token');
 
-    categories = await api.get('/categories', {
+    const response = await api.get('/categories', {
       headers:{
         'Content-Type': 'application/json',
         'Authorization': token,
       }
-    })
+    }).then(response => {
+      return response;
+    }).catch(err => {
+      return err.response;
+    });
 
-    console.log(categories);
+    console.log(response);
+    if(response)
+      if(response.status === 200){
+        setCategories(response.data);
+      }else{
+        console.log(response);
+      }
+
   }
 
   return (
@@ -40,8 +50,28 @@ const CategoriesList = () => {
       <div className={classes.content}>
         {/* {categories.length > 0  ? <CategoriesTable categories={categories} /> : <Typography variant="h1">Nenhuma Categoria encontrada.</Typography> } */}
         {/* <CategoriesMTable /> */}
-        <CategoryCard />
-        <CategoryCard />
+        <Grid
+          container
+          direction="row"
+          justify="center"
+          spacing={2}
+          wrap="wrap"
+        >
+          {categories.map(category => {
+            return (
+              <Grid
+                item
+                key={category.id}
+                
+              >
+                <CategoryCard
+                  item={category}
+                  key={category.id}
+                />
+              </Grid>
+            );
+          })}
+        </Grid>
       </div>
     </div>
   );

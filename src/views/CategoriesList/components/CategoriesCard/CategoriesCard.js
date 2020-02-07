@@ -7,56 +7,65 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-
+import Skeleton from  '@material-ui/lab/Skeleton';
 const useStyles = makeStyles({
   root: {
     maxWidth: 345,
   },
+  backgroundColor: {
+    backgroundColor: '#3ff',
+  }
 });
 
-const CategoriesCard = ({ id, name, image}) => {
+const CategoriesCard = ({ loading=false, item}) => {
   const classes = useStyles();
   return (
+    
     <Card className={classes.root}>
+      <img src={URL.createObjectURL(new Blob([item.image.data], {'type': 'image/png'}))} />
+
       <CardActionArea>
-        <CardMedia
+        {item ? (<CardMedia
           alt="Contemplative Reptile"
-          component="img"
-          height="140"
-          image="/static/images/cards/contemplative-reptile.jpg"
+          component="img"d
+          height="130"
           title="Contemplative Reptile"
-        />
+          width="320"
+        />) : (
+          <Skeleton
+            height={200}
+            variant="rect"
+            width={200}
+          />
+        )}
         <CardContent>
-          <Typography
+          {item ? (<Typography
             component="h2"
             gutterBottom
             variant="h5"
-          >
-            Lizard
-          </Typography>
-          <Typography
-            color="textSecondary"
-            component="p"
-            variant="body2"
-          >
-            Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging
-            across all continents except Antarctica
-          </Typography>
+                   >
+            {item.name}
+          </Typography>) : (
+            <Skeleton />
+          )}
+          
         </CardContent>
       </CardActionArea>
       <CardActions>
-        <Button
+        {item ? (<Button
+          color={classes.color}
+          size="small"
+                 >
+          Editar
+        </Button>) : 
+          (<Skeleton width={50} />)}
+        {item ? (<Button
           color="primary"
           size="small"
         >
-          Share
-        </Button>
-        <Button
-          color="primary"
-          size="small"
-        >
-          Learn More
-        </Button>
+          Excluir
+        </Button>) : 
+          (<Skeleton width={70} />)}
       </CardActions>
     </Card>
   );

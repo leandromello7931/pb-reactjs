@@ -114,7 +114,7 @@ const SignIn = props => {
       ...formState,
       isLoading: false,
     }));
-    if(response)
+    if(response){
       if(response.status === 200){
         localStorage.setItem('token', response.data.token);
         history.push('/dashboard');
@@ -124,7 +124,13 @@ const SignIn = props => {
           loginFailed: true,
           openSnack: true
         }));
-      }
+      }}else{
+      setFormState(formState => ({
+        ...formState,
+        loginFailed: true,
+        openSnack: true
+      }));
+    }
   };
 
 
