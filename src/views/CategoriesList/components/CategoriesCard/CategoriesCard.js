@@ -8,12 +8,10 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Skeleton from  '@material-ui/lab/Skeleton';
+import {baseURL} from '../../../../services/api';
 const useStyles = makeStyles({
   root: {
     maxWidth: 345,
-  },
-  backgroundColor: {
-    backgroundColor: '#3ff',
   }
 });
 
@@ -22,15 +20,15 @@ const CategoriesCard = ({ loading=false, item}) => {
   return (
     
     <Card className={classes.root}>
-      <img src={URL.createObjectURL(new Blob([item.image.data], {'type': 'image/png'}))} />
-
+    
       <CardActionArea>
         {item ? (<CardMedia
           alt="Contemplative Reptile"
-          component="img"d
-          height="130"
-          title="Contemplative Reptile"
-          width="320"
+          component="img"
+          height="200"
+          image= {`${baseURL}/files/${item.image}`}
+
+          width="240"
         />) : (
           <Skeleton
             height={200}
@@ -43,7 +41,7 @@ const CategoriesCard = ({ loading=false, item}) => {
             component="h2"
             gutterBottom
             variant="h5"
-                   >
+          >
             {item.name}
           </Typography>) : (
             <Skeleton />
@@ -55,7 +53,7 @@ const CategoriesCard = ({ loading=false, item}) => {
         {item ? (<Button
           color={classes.color}
           size="small"
-                 >
+        >
           Editar
         </Button>) : 
           (<Skeleton width={50} />)}

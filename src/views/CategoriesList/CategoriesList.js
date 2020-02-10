@@ -4,6 +4,7 @@ import {  CategoryCard } from './components';
 import api from '../../services/api';
 import { Grid } from '@material-ui/core';
 
+
 const useStyles = makeStyles(theme => ({
   root: {
     padding: theme.spacing(3)
