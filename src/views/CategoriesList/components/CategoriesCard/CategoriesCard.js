@@ -136,13 +136,14 @@ const CategoriesCard = () => {
               <Card className={classes.card}>
     
                 <CardActionArea>
-                  {categories ? (<CardMedia
-                    alt="Contemplative Reptile"
-                    component="img"
-                    height="200"
-                    image= {`${baseURL}/files/${category.image}`}
-                    width="200"
-                                 />) : (
+                  {categories ? (
+                    <CardMedia
+                      alt="Contemplative Reptile"
+                      component="img"
+                      height="200"
+                      image= {`${baseURL}/files/${category.image}`}
+                      width="200"
+                    />) : (
                     <Skeleton
                       height={200}
                       variant="rect"
