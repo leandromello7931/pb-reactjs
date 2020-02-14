@@ -1,7 +1,14 @@
 import React, {useState, useEffect} from 'react';
 import { makeStyles } from '@material-ui/styles';
 import {  CategoryCard, CategoriesToolbar } from './components';
-import { Grid, Fab } from '@material-ui/core';
+import { Grid, Fab, Dialog, 
+  DialogActions, 
+  DialogTitle, 
+  DialogContent, 
+  DialogContentText,
+  TextField,
+  Button
+} from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import api from '../../services/api';
 import CustomizedSnackbar from '../../components/Snackbar';
@@ -34,6 +41,8 @@ const CategoriesList = () => {
     message: '',
     severity: ''
   });
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   useEffect(() => {
     getCategories();
   }, []);
@@ -107,6 +116,14 @@ const CategoriesList = () => {
     }));
   }
 
+  //Dialog functions 
+  const handleDialogClickOpen = () => {
+    setDialogOpen(true);
+  };
+
+  const handleDialogClickClose = () => {
+    setDialogOpen(false);
+  };
 
   return (
     <>
@@ -143,7 +160,7 @@ const CategoriesList = () => {
             aria-label="add"
             className={classes.fab}
             color="secondary"
-            onClick={handleNewCategory}
+            onClick={handleDialogClickOpen}
             position="right-bottom"
             slot="fixed"
           >
@@ -162,7 +179,42 @@ const CategoriesList = () => {
         vertical="top"
       />
 
-      
+      <Dialog
+        aria-labelledby="form-dialog-title"
+        onClose={handleDialogClickClose}
+        open={dialogOpen}
+      >
+        <DialogTitle id="form-dialog-title">Incluir Categoria</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Para cadastrar uma nova categoria, preencha os campos abaixo.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            color="secondary"
+            fullWidth
+            id="name"
+            label="Nome"
+            margin="dense"
+            type="text"
+            variant="filled"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            color="primary"
+            onClick={handleDialogClickClose}
+          >
+            Cancelar
+          </Button>
+          <Button
+            color="primary"
+            onClick={handleDialogClickClose}
+          >
+            Salvar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
