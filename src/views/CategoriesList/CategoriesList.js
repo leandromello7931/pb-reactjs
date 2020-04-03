@@ -1,18 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import { makeStyles } from '@material-ui/styles';
-import {  CategoryCard, CategoriesToolbar } from './components';
-import { Grid, Fab, Dialog, 
-  DialogActions, 
-  DialogTitle, 
-  DialogContent, 
-  DialogContentText,
-  TextField,
-  Button
-} from '@material-ui/core';
+import {  CategoryCard, CategoriesToolbar, CategoryModal } from './components';
+import { Grid, Fab } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import api from '../../services/api';
 import CustomizedSnackbar from '../../components/Snackbar';
-const token = localStorage.getItem('token');
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -32,29 +24,33 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
+
 const CategoriesList = () => {
   const classes = useStyles();
  
   const [categories, setCategories] = useState([]);
+  const [category, setCategory] = useState({
+    name: '',
+    file: ''
+  });
+
   const [snack, setSnack] = useState({
     open: false,
     message: '',
     severity: ''
   });
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     getCategories();
   }, []);
 
-
-
   // CRUD Funcionts
   const getCategories = async () => {
     const response = await api.get('/categories', {
       headers:{
-        'Content-Type': 'application/json',
-        'Authorization': token,
+        'Content-Type': 'application/json'
       }
     }).then(response => {
       return response;
@@ -65,20 +61,85 @@ const CategoriesList = () => {
     if(response)
       if(response.status === 200){
         setCategories(response.data);
+        console.log(response.data);
       }else{
         console.log(response);
       }
   }
 
-  const handleNewCategory = async () => {
-    console.log('new');
+  const handleFileUpload = (file) => {
+    setCategory(category => ({
+      ...category,
+      file: file
+    }));
+  }
+
+  const handleRemoveUploadedFile = () => {
+    setCategory(category => ({
+      ...category,
+      file: ''
+    }));
+  }
+  const handleChange = (event) => {
+    event.persist();
+    setCategory(category => 
+      ({...category, 
+        [event.target.name]: event.target.value
+      }));
+  }
+
+  const handleNewCategory = async (event) => {
+    event.preventDefault();
+    setIsLoading(true);
+    const formData = new FormData();
+
+    formData.append('name', category.name);
+    formData.append('image', category.file);
+    formData.append('active', true);
+
+    const response = await api.post('categories', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }).then( response => {
+      return response;
+    }).catch( err => {
+      return err.response;
+    });
+    setIsLoading(false);
+    if(response){
+      if(response.status === 200){
+        handleDialogClickClose();
+        setCategory( () => ({
+          name: '',
+          file: '',
+        }));
+        const newCategory = response.data;
+        console.log(newCategory);
+        const newCategoriesList = [...categories, newCategory.category ]
+        setCategories(newCategoriesList);
+        console.log(categories);
+        setSnack( snack => ({
+          ...snack,
+          message: 'Categoria incluída com sucesso.',
+          open: true,
+          severity: 'success'
+        }));
+      }else{
+        setSnack( snack => ({
+          ...snack,
+          message: 'Parece que algo deu errado. Tente novamente.',
+          open: true,
+          severity: 'error'
+        }));
+      }
+    }
   };
 
   const handleDelete = async (id) => {
     const response = await api.delete(`/categories/${id}`, {
       headers:{
-        'Content-Type': 'application/json',
-        'Authorization': token,
+        'Content-Type': 'application/json'
       }
     }).then(response => {
       return response;
@@ -109,7 +170,10 @@ const CategoriesList = () => {
   //End Crud Functions
 
   //Snackbar Functions
-  const handleSnackBarClose = () => {
+  const handleSnackBarClose = (event, reason) => {
+    if (reason === 'clickaway'){
+      return;
+    }
     setSnack( snack => ({
       ...snack,
       open: false,
@@ -123,6 +187,7 @@ const CategoriesList = () => {
 
   const handleDialogClickClose = () => {
     setDialogOpen(false);
+
   };
 
   return (
@@ -179,42 +244,16 @@ const CategoriesList = () => {
         vertical="top"
       />
 
-      <Dialog
-        aria-labelledby="form-dialog-title"
-        onClose={handleDialogClickClose}
-        open={dialogOpen}
-      >
-        <DialogTitle id="form-dialog-title">Incluir Categoria</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Para cadastrar uma nova categoria, preencha os campos abaixo.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            color="secondary"
-            fullWidth
-            id="name"
-            label="Nome"
-            margin="dense"
-            type="text"
-            variant="filled"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button
-            color="primary"
-            onClick={handleDialogClickClose}
-          >
-            Cancelar
-          </Button>
-          <Button
-            color="primary"
-            onClick={handleDialogClickClose}
-          >
-            Salvar
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <CategoryModal
+        category = {category}
+        dialogOpen = {dialogOpen}
+        handleChange = {handleChange} 
+        handleDialogClickClose = {handleDialogClickClose}
+        handleFileUpload = {handleFileUpload}
+        handleRemoveUploadedFile = {handleRemoveUploadedFile}
+        handleSubmit = {handleNewCategory}
+        isLoading = {isLoading}
+      />
     </>
   );
 };
