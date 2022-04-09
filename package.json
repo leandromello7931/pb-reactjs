@@ -37,7 +37,7 @@
     "clsx": "^1.0.4",
     "history": "^4.9.0",
     "material-table": "^1.57.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "moment-timezone": "^0.5.27",
     "node-sass": "^4.13.1",
     "prop-types": "^15.7.2",
